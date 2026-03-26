@@ -10,6 +10,9 @@ import WeatherSkeleton from "./components/WeatherSkeleton";
 import { useFavorites } from "./hooks/useFavorites";
 import { useWeather } from "./hooks/useWeather";
 import { getGradient, getParticles } from "./utils/weatherTheme";
+
+import AIInsights from "./components/AIInsights";
+
 import "./styles/weather.css";
 
 export default function App() {
@@ -21,19 +24,28 @@ export default function App() {
     loading,
     error,
     fetchWeather,
+    fetchWeatherByCoords,
     fetchFavoritesWeather,
+    aiSummary,
+    aiActivity,
+    aiOutfit,
+    aiLoading,
+    activityLoading,
+    outfitLoading,
+    callAi,
   } = useWeather();
 
-  const {
-    favorites,
-    addFavorite,
-    removeFavorite,
-    isFavorite,
-  } = useFavorites();
+  const { favorites, addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   useEffect(() => {
     fetchWeather("Pabna");
   }, [fetchWeather]);
+
+  useEffect(() => {
+    if (weather) {
+      callAi("summary");
+    }
+  }, [weather, callAi]);
 
   const colors = useMemo(() => {
     const condition = weather?.weather?.condition || "";
@@ -54,12 +66,37 @@ export default function App() {
     }
   };
 
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        await fetchWeatherByCoords(coords.latitude, coords.longitude);
+        setActiveTab("weather");
+      },
+      () => {
+        alert("Location access denied.");
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+      },
+    );
+  };
+
   return (
     <div className="app-shell">
       <AnimatedBg colors={colors} type={particleType} />
 
       <div className="app-content">
-        <SearchBar onSearch={fetchWeather} loading={loading} />
+        <SearchBar
+          onSearch={fetchWeather}
+          onUseLocation={handleUseLocation}
+          loading={loading}
+        />
 
         <Tabs activeTab={activeTab} onChange={setActiveTab} />
 
@@ -74,7 +111,22 @@ export default function App() {
                 <WeatherHero
                   weather={weather}
                   onToggleFavorite={handleToggleFavorite}
-                  isFavorite={weather?.location?.name ? isFavorite(weather.location.name) : false}
+                  isFavorite={
+                    weather?.location?.name
+                      ? isFavorite(weather.location.name)
+                      : false
+                  }
+                />
+                <AIInsights
+                  weather={weather}
+                  aiSummary={aiSummary}
+                  aiActivity={aiActivity}
+                  aiOutfit={aiOutfit}
+                  aiLoading={aiLoading}
+                  activityLoading={activityLoading}
+                  outfitLoading={outfitLoading}
+                  onAskActivity={() => callAi("activity")}
+                  onAskOutfit={() => callAi("outfit")}
                 />
                 <StatsGrid weather={weather} />
                 <HourlyChart hourly={hourly} />

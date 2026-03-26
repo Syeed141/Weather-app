@@ -28,7 +28,9 @@ export function useFavorites() {
   };
 
   const removeFavorite = (city) => {
-    setFavorites((prev) => prev.filter((item) => item.toLowerCase() !== city.toLowerCase()));
+    setFavorites((prev) =>
+      prev.filter((item) => item.toLowerCase() !== city.toLowerCase())
+    );
   };
 
   const isFavorite = (city) => {

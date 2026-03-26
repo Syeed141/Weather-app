@@ -11,7 +11,7 @@ export default function StatsGrid({ weather }) {
   ];
 
   return (
-    <div className="stats-grid">
+    <div className="stats-grid ">
       {stats.map((item) => (
         <div key={item.label} className="stat-card glass-card">
           <div className="stat-icon">{item.icon}</div>

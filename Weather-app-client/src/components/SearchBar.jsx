@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function SearchBar({ onSearch, loading }) {
+export default function SearchBar({ onSearch, onUseLocation, loading }) {
   const [input, setInput] = useState("Pabna");
 
   const handleSubmit = (e) => {
@@ -17,8 +17,18 @@ export default function SearchBar({ onSearch, loading }) {
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
+
       <button type="submit" className="search-btn" disabled={loading}>
         {loading ? "Loading..." : "Search"}
+      </button>
+
+      <button
+        type="button"
+        className="location-btn"
+        onClick={onUseLocation}
+        disabled={loading}
+      >
+        📍 My Location
       </button>
     </form>
   );

@@ -7,6 +7,7 @@ export default function Tabs({ activeTab, onChange }) {
       >
         Weather
       </button>
+
       <button
         className={`tab-btn ${activeTab === "favorites" ? "active" : ""}`}
         onClick={() => onChange("favorites")}
